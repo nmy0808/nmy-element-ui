@@ -21,6 +21,8 @@ declare module '@vue/runtime-core' {
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     IconChooseSrc: typeof import('./../components/iconChoose/src/index.vue')['default']
     NFormSrc: typeof import('./../components/nForm/src/index.vue')['default']
+    NFormSrcEditor: typeof import('./../components/nForm/src/editor.vue')['default']
+    NFormSrcNEditor: typeof import('./../components/nForm/src/nEditor.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
