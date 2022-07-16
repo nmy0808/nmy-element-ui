@@ -19,6 +19,7 @@ export interface IFormSchema {
     | 'time-select'
     | 'transfer'
     | 'upload'
+    | 'editor'
   value: any
   label?: string
   placeholder?: string
@@ -29,6 +30,9 @@ export interface IFormSchema {
     clearable?: boolean
     showPassword?: boolean
     disabled?: boolean
+  }
+  editorAttrs?: {
+    height: number
   }
   children?: IFormSchema[]
 }

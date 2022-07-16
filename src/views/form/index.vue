@@ -112,26 +112,68 @@ const schema = ref<IFormSchema[]>([
         label: '程序员'
       }
     ]
+  },
+  {
+    type: 'editor',
+    value: '13',
+    label: '描述',
+    prop: 'desc',
+    placeholder: '请填写描述',
+    editorAttrs: {
+      height: 300
+    },
+    rules: [
+      {
+        trigger: 'blur',
+        required: true,
+        message: '请填写描述'
+      }
+    ]
+  },
+  {
+    type: 'editor',
+    value: '21',
+    label: '描述2',
+    prop: 'desc2',
+    placeholder: '请填写描述',
+    editorAttrs: {
+      height: 300
+    },
+    rules: [
+      {
+        trigger: 'blur',
+        required: true,
+        message: '请填写描述'
+      }
+    ]
   }
 ])
 const formOptions = {
   labelWidth: '200px'
 }
-
-const handleSubmit = ({ form, model }: IActionScope) => {
-  console.log(model)
+const nFormRef = ref(null)
+const handleSubmit = async ({ form, model }: IActionScope) => {
+  const flag = (await (nFormRef.value as any).validate()) as boolean
+  if (flag) {
+    console.log(model)
+  }
 }
 const handleReset = (form: IActionScope['form']) => {
-  form.resetFields()
+  ;(nFormRef.value as any).resetFields()
 }
 </script>
 
 <template>
   <div class="">
-    <NForm :schema="schema" :form-options="formOptions" @submit="handleSubmit">
+    <NForm
+      ref="nFormRef"
+      :schema="schema"
+      :form-options="formOptions"
+      @submit="handleSubmit"
+    >
       <template #action="scope">
         <el-button type="" @click="handleReset(scope.form)">重置</el-button>
-        <el-button type="primary" native-type="submit">提交</el-button>
+        <el-button type="primary" @click="handleSubmit(scope)">提交</el-button>
       </template>
     </NForm>
   </div>

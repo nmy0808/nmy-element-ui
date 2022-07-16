@@ -2,8 +2,9 @@
 import { PropType } from 'vue'
 import { IFormSchema } from './types/options'
 import { ElFormType } from './types/elForm'
-
 import cloneDeep from 'lodash/cloneDeep'
+
+const NEditor = defineAsyncComponent(() => import('./nEditor.vue'))
 
 const props = defineProps({
   schema: {
@@ -24,15 +25,36 @@ const formRef = ref<ElFormType | null>(null)
 const model = ref<any>({})
 const rules = ref<any>({})
 
-const handleSubmit = (e: Event) => {
-  e.preventDefault()
-  formRef.value?.validate((valid) => {
-    if (valid) {
-      const payload = { model: cloneDeep(model.value), form: formRef.value }
-      emit('submit', payload)
-    }
+const resetFields = () => {
+  const schema = cloneDeep(props.schema)
+  schema.forEach((item) => {
+    model.value[item.prop!] = item.value
+    console.log(item.prop, item.value)
   })
 }
+
+const validate = () => {
+  return new Promise((resolve, reject) => {
+    formRef.value?.validate((valid) => {
+      resolve(valid)
+    })
+  })
+}
+
+const handleSubmit = async (e: Event) => {
+  e.preventDefault()
+  const flag = await validate()
+  if (flag) {
+    const payload = { model: cloneDeep(model.value), form: formRef.value }
+    emit('submit', payload)
+  }
+}
+
+const handleEditChange = (prop: string, html: string) => {
+  model.value[prop] = html
+}
+
+defineExpose({ resetFields, validate })
 
 onMounted(() => {
   const schema = cloneDeep(props.schema)
@@ -56,18 +78,28 @@ onMounted(() => {
   >
     <template v-for="(item, index) in schema" :key="index">
       <el-form-item :prop="item.prop" :label="item.label">
-        <component
-          :is="`el-${item.type}`"
-          v-model="model[item.prop!]"
-          :placeholder="item.placeholder"
-          v-bind="item.attrs"
-        >
-          <template v-if="item.children && item.children.length">
-            <template v-for="(cItem, cIndex) in item.children" :key="cIndex">
-              <component :is="`el-${cItem.type}`" v-bind="cItem"> </component>
+        <template v-if="item.type === 'editor'">
+          <NEditor
+            v-model="model[item.prop!]"
+            :placeholder="item.placeholder"
+            v-bind="item.editorAttrs"
+            @change="(html) => handleEditChange(item.prop!, html)"
+          ></NEditor>
+        </template>
+        <template v-else>
+          <component
+            :is="`el-${item.type}`"
+            v-model="model[item.prop!]"
+            :placeholder="item.placeholder"
+            v-bind="item.attrs"
+          >
+            <template v-if="item.children && item.children.length">
+              <template v-for="(cItem, cIndex) in item.children" :key="cIndex">
+                <component :is="`el-${cItem.type}`" v-bind="cItem"> </component>
+              </template>
             </template>
-          </template>
-        </component>
+          </component>
+        </template>
       </el-form-item>
     </template>
     <el-form-item>
