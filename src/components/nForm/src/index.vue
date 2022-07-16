@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { PropType } from 'vue'
 import { IFormSchema } from './types/options'
+import { ElFormType } from './types/elForm'
 
 import cloneDeep from 'lodash/cloneDeep'
 
@@ -14,6 +15,7 @@ const props = defineProps({
     default: () => ({})
   }
 })
+const formRef = ref<ElFormType | null>(null)
 const model = ref<any>({})
 const rules = ref<any>({})
 onMounted(() => {
@@ -29,6 +31,7 @@ onMounted(() => {
 <template>
   <pre>{{ model }}</pre>
   <el-form
+    ref="formRef"
     :model="model"
     :validate-on-rule-change="false"
     :rules="rules"
@@ -50,6 +53,9 @@ onMounted(() => {
         </component>
       </el-form-item>
     </template>
+    <el-form-item>
+      <slot name="action" :form="formRef" :model="model"></slot>
+    </el-form-item>
   </el-form>
 </template>
 

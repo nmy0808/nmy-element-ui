@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { IActionScope } from '@/components/nForm/src/types/actionScope'
 import { IFormSchema } from '@/components/nForm/src/types/options'
-import { FormProps } from 'element-plus'
 
 const schema = ref<IFormSchema[]>([
   {
@@ -117,11 +117,33 @@ const schema = ref<IFormSchema[]>([
 const formOptions = {
   labelWidth: '200px'
 }
+
+const handleSubmit = ({ form, model }: IActionScope) => {
+  form.validate((valid) => {
+    if (valid) {
+      console.log(model)
+    } else {
+      ElMessage({
+        type: 'error',
+        message: '验证失败',
+        duration: 1500
+      })
+    }
+  })
+}
+const handleReset = (form: IActionScope['form']) => {
+  form.resetFields()
+}
 </script>
 
 <template>
   <div class="">
-    <NForm :schema="schema" :form-options="formOptions"></NForm>
+    <NForm :schema="schema" :form-options="formOptions">
+      <template #action="scope">
+        <el-button type="" @click="handleReset(scope.form)">重置</el-button>
+        <el-button type="primary" @click="handleSubmit(scope)">提交</el-button>
+      </template>
+    </NForm>
   </div>
 </template>
 
