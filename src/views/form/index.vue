@@ -119,17 +119,7 @@ const formOptions = {
 }
 
 const handleSubmit = ({ form, model }: IActionScope) => {
-  form.validate((valid) => {
-    if (valid) {
-      console.log(model)
-    } else {
-      ElMessage({
-        type: 'error',
-        message: '验证失败',
-        duration: 1500
-      })
-    }
-  })
+  console.log(model)
 }
 const handleReset = (form: IActionScope['form']) => {
   form.resetFields()
@@ -138,10 +128,10 @@ const handleReset = (form: IActionScope['form']) => {
 
 <template>
   <div class="">
-    <NForm :schema="schema" :form-options="formOptions">
+    <NForm :schema="schema" :form-options="formOptions" @submit="handleSubmit">
       <template #action="scope">
         <el-button type="" @click="handleReset(scope.form)">重置</el-button>
-        <el-button type="primary" @click="handleSubmit(scope)">提交</el-button>
+        <el-button type="primary" native-type="submit">提交</el-button>
       </template>
     </NForm>
   </div>

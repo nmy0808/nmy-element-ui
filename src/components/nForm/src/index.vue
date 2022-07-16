@@ -15,9 +15,25 @@ const props = defineProps({
     default: () => ({})
   }
 })
+
+const emit = defineEmits<{
+  (e: 'submit', payload: any): void
+}>()
+
 const formRef = ref<ElFormType | null>(null)
 const model = ref<any>({})
 const rules = ref<any>({})
+
+const handleSubmit = (e: Event) => {
+  e.preventDefault()
+  formRef.value?.validate((valid) => {
+    if (valid) {
+      const payload = { model: cloneDeep(model.value), form: formRef.value }
+      emit('submit', payload)
+    }
+  })
+}
+
 onMounted(() => {
   const schema = cloneDeep(props.schema)
   schema.forEach((item) => {
@@ -35,6 +51,7 @@ onMounted(() => {
     :model="model"
     :validate-on-rule-change="false"
     :rules="rules"
+    @submit="handleSubmit"
     v-bind="formOptions"
   >
     <template v-for="(item, index) in schema" :key="index">
