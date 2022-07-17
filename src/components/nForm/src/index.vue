@@ -3,8 +3,10 @@ import { PropType } from 'vue'
 import { IFormSchema } from './types/options'
 import { ElFormType } from './types/elForm'
 import cloneDeep from 'lodash/cloneDeep'
-
-const NEditor = defineAsyncComponent(() => import('./nEditor.vue'))
+import NEditor from '@/components//nEditor/src/index.vue'
+// const NEditor = defineAsyncComponent(
+//   () => import('@/components//nEditor/src/index.vue')
+// )
 
 const props = defineProps({
   schema: {
@@ -29,8 +31,8 @@ const resetFields = () => {
   const schema = cloneDeep(props.schema)
   schema.forEach((item) => {
     model.value[item.prop!] = item.value
-    console.log(item.prop, item.value)
   })
+  formRef.value?.clearValidate()
 }
 
 const validate = () => {
@@ -54,7 +56,11 @@ const handleEditChange = (prop: string, html: string) => {
   model.value[prop] = html
 }
 
-defineExpose({ resetFields, validate })
+const getModel = () => {
+  return cloneDeep(model.value)
+}
+
+defineExpose({ resetFields, validate, getModel })
 
 onMounted(() => {
   const schema = cloneDeep(props.schema)
@@ -67,7 +73,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <pre>{{ model }}</pre>
   <el-form
     ref="formRef"
     :model="model"
@@ -82,8 +87,9 @@ onMounted(() => {
           <NEditor
             v-model="model[item.prop!]"
             :placeholder="item.placeholder"
+            :custom-upload="(item.editorOptions?.customUpload as any)"
             v-bind="item.editorAttrs"
-            @change="(html) => handleEditChange(item.prop!, html)"
+            @change="(html:string) => handleEditChange(item.prop!, html)"
           ></NEditor>
         </template>
         <template v-else>

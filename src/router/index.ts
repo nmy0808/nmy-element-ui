@@ -24,6 +24,14 @@ const routes: RouteRecordRaw[] = [
           title: 'form',
           icon: 'Files'
         }
+      },
+      {
+        path: 'modelForm',
+        component: () => import('@/views/modelForm/index.vue'),
+        meta: {
+          title: 'modelForm',
+          icon: 'Files'
+        }
       }
     ]
   }

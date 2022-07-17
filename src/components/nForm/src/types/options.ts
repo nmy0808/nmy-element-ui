@@ -1,3 +1,4 @@
+import { customUploadType } from '@/components/nEditor/src/types/customUpload'
 import { CSSProperties } from 'vue'
 import { RuleItem } from './rules'
 
@@ -33,6 +34,9 @@ export interface IFormSchema {
   }
   editorAttrs?: {
     height: number
+  }
+  editorOptions?: {
+    customUpload: customUploadType
   }
   children?: IFormSchema[]
 }

@@ -7,6 +7,8 @@ import {
   IDomEditor,
   IToolbarConfig
 } from '@wangeditor/editor'
+import { PropType } from 'vue'
+import { InsertFnType } from './types/InsertFnType'
 
 const props = defineProps({
   modelValue: {
@@ -20,6 +22,10 @@ const props = defineProps({
   height: {
     type: Number,
     default: 300
+  },
+  customUpload: {
+    type: [Function] as PropType<(file: File, insertFn: InsertFnType) => void>,
+    default: null
   }
 })
 
@@ -33,7 +39,27 @@ const toolbarRef = ref(null)
 let editor: any
 const init = () => {
   // 编辑器配置
-  const editorConfig: Partial<IEditorConfig> = {}
+  const editorConfig: Partial<IEditorConfig> = {
+    MENU_CONF: {}
+  }
+  editorConfig.MENU_CONF!['uploadImage'] = {
+    customUpload(file: File, insertFn: InsertFnType) {
+      props.customUpload && props.customUpload(file, insertFn)
+
+      // const formData = new FormData()
+      // formData.append('file', file)
+      // fetch('http://127.0.0.1:8888/api/upload', {
+      //   method: 'POST',
+      //   body: formData
+      // })
+      //   .then((res) => {
+      //     return res.json()
+      //   })
+      //   .then((res) => {
+      //     insertFn(`${res.data}`, '', '')
+      //   })
+    }
+  }
   editorConfig.placeholder = props.placeholder
   editorConfig.onChange = (editor: IDomEditor) => {
     // 当编辑器选区、内容变化时，即触发
@@ -42,7 +68,9 @@ const init = () => {
   }
 
   // 工具栏配置
-  const toolbarConfig: Partial<IToolbarConfig> = {}
+  const toolbarConfig: Partial<IToolbarConfig> = {
+    excludeKeys: ['group-video']
+  }
 
   // 创建编辑器
   editor = createEditor({
@@ -57,6 +85,8 @@ const init = () => {
     config: toolbarConfig,
     mode: 'default' // 或 'simple' 参考下文
   })
+  console.log(toolbar.getConfig())
+  console.log(editor.getMenuConfig('fontSize'))
 }
 
 watch(
