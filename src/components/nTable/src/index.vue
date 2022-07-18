@@ -4,6 +4,7 @@ import { ITableOptions } from './types/options'
 import NIcon from '@/components/cIcon/index.vue'
 import { ElFormType } from '@/components/nForm/src/types/elForm'
 import cloneDeep from 'lodash/cloneDeep'
+import isEqual from 'lodash/isEqual'
 
 const props = defineProps({
   options: {
@@ -13,6 +14,11 @@ const props = defineProps({
   data: {
     type: Array,
     required: true
+  },
+  // 单独配置表格操作项
+  actionTableColumnOptions: {
+    type: Object,
+    default: () => ({})
   }
 })
 
@@ -62,7 +68,8 @@ const handleActiveEdit = (scope: any) => {
 }
 
 // 单元格: 点击单元格确认编辑
-const handleConfirm = (scope: any) => {
+const handleConfirm = async (scope: any) => {
+  await validate()
   activeColEditId.value = -1
   activeRowIndex.value = -1
   const index = scope.$index
@@ -74,8 +81,14 @@ const handleConfirm = (scope: any) => {
     index,
     data: cloneDeep(dataClone.value)
   }
-  emit('confirm', payload)
-  return payload
+  const flag = isEqual(row, oldRow)
+  // 只有修改了数据, 才会触发事件
+  if (!flag) {
+    emit('confirm', payload)
+    return payload
+  } else {
+    return null
+  }
 }
 
 // 行 和 单元格: 点击取消编辑
@@ -86,9 +99,11 @@ const handleCancel = () => {
   dataClone.value = cloneDeep(props.data)
 }
 // 行: 确定当前行编辑
-const confirmRowEdit = () => {
+const confirmRowEdit = async () => {
+  await validate()
   const $index = activeRowIndex.value
-  const scope = { $index, row: dataClone.value[$index] }
+  const row = dataClone.value[$index]
+  const scope = { $index, row }
   return handleConfirm(scope)
 }
 
@@ -97,7 +112,33 @@ const handleRowClick = (row: any, column: any) => {
   console.log(row)
   console.log(column)
 }
-
+// 验证当前行
+function validate() {
+  let formRefList = []
+  const promiseList: Promise<any>[] = []
+  if (Array.isArray(formRef.value)) {
+    formRefList = formRef.value
+  } else {
+    formRef.value && formRefList.push(formRef.value)
+  }
+  formRefList.forEach((formRef) => {
+    const promise = new Promise((resolve, reject) => {
+      ;(formRef as ElFormType).validate((valid) => {
+        if (valid) {
+          resolve(valid)
+        } else {
+          reject(valid)
+        }
+      })
+    })
+    promiseList.push(promise)
+  })
+  return new Promise((resolve, reject) => {
+    Promise.all(promiseList).then((_) => {
+      resolve(true)
+    })
+  })
+}
 defineExpose({
   activeRowEditByIndex,
   confirmRowEdit,
@@ -130,29 +171,39 @@ defineExpose({
                 activeRowIndex === scope.$index)
             "
           >
-            <slot
-              v-if="item.editSlot"
-              :name="item.editSlot"
-              :row="scope.row"
-              :$index="scope.$index"
-              :$column="scope.column"
-              :$store="scope.store"
-            ></slot>
-            <!-- 注意: 如果没有配置开启编辑状态的表单插槽, 默认为输入框表单组件 -->
-            <el-input v-else v-model="scope.row[item.prop!]"></el-input>
-            <!-- 当前如果是激活行编辑, 列编辑操作图标不会显示 -->
-            <template v-if="activeRowIndex === -1">
-              <NIcon
-                icon="check"
-                @click.stop="handleConfirm(scope)"
-                class="icon-edit"
-              ></NIcon>
-              <NIcon
-                icon="close"
-                @click.stop="handleCancel"
-                class="icon-edit"
-              ></NIcon>
-            </template>
+            <el-form :model="dataClone[scope.$index]" ref="formRef">
+              <el-form-item :prop="item.prop" :rules="item.rules as any || []">
+                <div class="col-edit-box">
+                  <slot
+                    v-if="item.editSlot"
+                    :name="item.editSlot"
+                    :row="scope.row"
+                    :$index="scope.$index"
+                    :$column="scope.column"
+                    :$store="scope.store"
+                  ></slot>
+                  <!-- 注意: 如果没有配置开启编辑状态的表单插槽, 默认为输入框表单组件 -->
+                  <el-input v-else v-model="scope.row[item.prop!]"></el-input>
+                  <!-- 当前如果是激活行编辑, 列编辑操作图标不会显示 -->
+                  <template v-if="activeRowIndex === -1">
+                    <NIcon
+                      icon="check"
+                      @click.stop="handleConfirm(scope)"
+                      :size="18"
+                      color="green"
+                      class="icon"
+                    ></NIcon>
+                    <NIcon
+                      icon="close"
+                      @click.stop="handleCancel"
+                      :size="18"
+                      color="red"
+                      class="icon"
+                    ></NIcon>
+                  </template>
+                </div>
+              </el-form-item>
+            </el-form>
           </template>
           <!-- 当前没有开启编辑的状态 -->
           <template v-else>
@@ -170,15 +221,17 @@ defineExpose({
             <!--  编辑按钮 -->
             <NIcon
               v-if="item.editable"
+              class="icon-edit icon"
               icon="edit"
+              :size="18"
+              color="#409eff"
               @click.stop="handleActiveEdit(scope)"
-              class="icon-edit"
             ></NIcon>
           </template>
         </template>
       </el-table-column>
     </template>
-    <el-table-column>
+    <el-table-column v-bind="actionTableColumnOptions">
       <template #default="scope">
         <!-- 如果当前开启了行编辑, 当前行显示 取消保存 按钮 -->
         <template v-if="activeRowIndex === scope.$index">
@@ -202,8 +255,15 @@ defineExpose({
 </template>
 
 <style scoped lang="scss">
-.icon-edit {
+.col-edit-box {
+  display: flex;
+  align-items: center;
+}
+.icon {
   cursor: pointer;
+  position: relative;
+  top: 4px;
+  margin-left: 6px;
 }
 </style>
 <script lang="ts">
