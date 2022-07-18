@@ -13,7 +13,11 @@ const props = defineProps<IProp>()
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.c-icon {
+  display: inline-block;
+}
+</style>
 <script lang="ts">
 export default {
   name: 'CIcon'

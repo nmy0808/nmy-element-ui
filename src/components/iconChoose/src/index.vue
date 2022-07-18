@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-
+import NIcon from '@/components/cIcon/index.vue'
 const visible = ref(false)
 const search = ref('')
 const keys = Object.keys(ElementPlusIconsVue)
@@ -33,7 +33,7 @@ const handleClose = () => {
               class="flex items-center justify-center flex-col w-40 h-26 hover:text-blue-500 cursor-pointer duration-200"
             >
               <div class="flex justify-center">
-                <CIcon :icon="item" :size="28"></CIcon>
+                <NIcon :icon="item" :size="28"></NIcon>
               </div>
               <div>{{ item }}</div>
             </div>

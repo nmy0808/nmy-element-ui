@@ -24,7 +24,8 @@ module.exports = {
     'vue/html-self-closing': 'off',
     'vue/valid-v-model': 'off',
     'dot-notation': 'off',
-    'no-use-before-define': 'off'
+    'no-use-before-define': 'off',
+    'vue/valid-attribute-name': 'off'
   },
   overrides: [
     {

@@ -27,15 +27,15 @@ export default defineConfig({
       imports: ['vue', 'vue-router'],
       dts: './src/types/auto-imports.d.ts'
     }),
-    Components({
-      resolvers: [ElementPlusResolver()],
-      // 自动引入
-      dirs: ['src/components'],
-      // 组件名称包含目录, 防止同名组件冲突
-      directoryAsNamespace: true,
-      // 指定类型声明文件, 为true时再项目根目录创建
-      dts: './src/types/components.d.ts'
-    }),
+    // Components({
+    //   resolvers: [ElementPlusResolver()],
+    //   // 自动引入
+    //   dirs: ['src/components'],
+    //   // 组件名称包含目录, 防止同名组件冲突
+    //   directoryAsNamespace: true,
+    //   // 指定类型声明文件, 为true时再项目根目录创建
+    //   dts: './src/types/components.d.ts'
+    // }),
     eslint({ cache: false })
   ],
   resolve: {
