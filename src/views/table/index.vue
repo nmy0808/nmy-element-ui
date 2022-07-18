@@ -107,6 +107,9 @@ const nameRules = [
 const selectionChange = (rows: any) => {
   console.log(rows)
 }
+const handleDragSort = (data: any[]) => {
+  console.log(data)
+}
 </script>
 
 <template>
@@ -116,11 +119,13 @@ const selectionChange = (rows: any) => {
       >取消激活</el-button
     >
     <NTable
+      border
       ref="tableRef"
       :data="data"
       :options="options"
       @confirm="handleConfirm"
-      @selectionChange="selectionChange"
+      @selection-change="selectionChange"
+      @drag-sort="handleDragSort"
     >
       <template #expand> 123123 </template>
       <template #date="{ $index }"> {{ $index }} </template>

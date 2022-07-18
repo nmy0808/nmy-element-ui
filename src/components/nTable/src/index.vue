@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import { PropType } from 'vue'
-import { ITableOptions } from './types/options'
-import NIcon from '@/components/cIcon/index.vue'
 import { ElFormType } from '@/components/nForm/src/types/elForm'
-import cloneDeep from 'lodash/cloneDeep'
-import isEqual from 'lodash/isEqual'
+import { ITableOptions } from './types/options'
 import { ElTable } from 'element-plus'
+import NIcon from '@/components/cIcon/index.vue'
+import cloneDeep from 'lodash/cloneDeep'
+import useDrop from './hooks/useDrop'
+import useSelection from './hooks/useSelection'
+import useForm from './hooks/useForm'
+import useEdit from './hooks/useEdit'
+import usePage from './hooks/usePage'
+
 const props = defineProps({
+  loading: {
+    type: Boolean,
+    default: false
+  },
   options: {
     type: Array as PropType<ITableOptions[]>,
     required: true
@@ -19,12 +28,56 @@ const props = defineProps({
   actionTableColumnOptions: {
     type: Object,
     default: () => ({})
+  },
+  // 开启排序
+  dragSort: {
+    type: Boolean,
+    default: true
+  },
+  // 显示分页 , 另外total小于pageSize不会显示分页
+  showPage: {
+    type: Boolean,
+    default: true
+  },
+  // 分页水平布局
+  pageAlign: {
+    type: String as PropType<'left' | 'center' | 'right'>,
+    default: 'right'
+  },
+  // 当前页
+  currentPage: {
+    type: Number,
+    default: 1
+  },
+  pageSize: {
+    type: Number,
+    default: 10
+  },
+  total: {
+    type: Number,
+    default: 0
+  },
+  pageLayout: {
+    type: String,
+    default: 'total, sizes, prev, pager, next, jumper'
+  },
+  pageSizes: {
+    type: Array,
+    default: () => [10, 20, 30]
+  },
+  // 获取列表数据 用于分页
+  getData: {
+    type: Function,
+    default: null
   }
 })
 
 const emit = defineEmits<{
   (e: 'confirm', payload: any): void
   (e: 'selectionChange', payload: any[]): void
+  (e: 'update:pagesize', pagesize: number): void
+  (e: 'update:currentPage', currentPage: number): void
+  (e: 'dragSort', data: any[]): void
 }>()
 
 const dataClone = ref<any[]>([])
@@ -39,129 +92,44 @@ watch(
 
 const formRef = ref<ElFormType | null>(null)
 
-const reset = () => {
-  formRef.value?.resetFields()
-}
-// 行: 当前激活编辑的行的索引 $index
-const activeRowIndex = ref(-1)
-
-// 单元格:当前激活编辑的单元格的唯一id  ( $index + column.id )
-const activeColEditId = ref(-1)
-
-// 行: 根据行索引激活当前行的编辑状态
-const activeRowEditByIndex = (index: number) => {
-  // 先恢复初始data数据
-  dataClone.value = cloneDeep(props.data)
-  activeColEditId.value = -1
-  activeRowIndex.value = index
-}
-// 行: 清空当前的行编辑状态
-const clearRowEdit = () => {
-  activeRowIndex.value = -1
-}
-
-// 单元格: 点击单元格编辑
-const handleActiveEdit = (scope: any) => {
-  // 先恢复初始data数据
-  dataClone.value = cloneDeep(props.data)
-  activeRowIndex.value = -1
-  activeColEditId.value = scope.$index + scope.column.id
-}
-
-// 单元格: 点击单元格确认编辑
-const handleConfirm = async (scope: any) => {
-  await validate()
-  activeColEditId.value = -1
-  activeRowIndex.value = -1
-  const index = scope.$index
-  const row = cloneDeep(scope.row)
-  const oldRow = cloneDeep(props.data[index])
-  const payload = {
-    row,
-    oldRow,
-    index,
-    data: cloneDeep(dataClone.value)
+// 计算当前分页对齐方向
+const pageAlignCalc = computed(() => {
+  if (props.pageAlign === 'left') {
+    return 'flex-start'
+  } else if (props.pageAlign === 'right') {
+    return 'flex-end'
   }
-  const flag = isEqual(row, oldRow)
-  // 只有修改了数据, 才会触发事件
-  if (!flag) {
-    emit('confirm', payload)
-    return payload
-  } else {
-    return null
-  }
-}
-
-// 行 和 单元格: 点击取消编辑
-const handleCancel = () => {
-  activeColEditId.value = -1
-  activeRowIndex.value = -1
-  // 恢复初始data数据
-  dataClone.value = cloneDeep(props.data)
-}
-// 行: 确定当前行编辑
-const confirmRowEdit = async () => {
-  await validate()
-  const $index = activeRowIndex.value
-  const row = dataClone.value[$index]
-  const scope = { $index, row }
-  return handleConfirm(scope)
-}
-
-//
-const handleRowClick = (row: any, column: any) => {
-  console.log(row)
-  console.log(column)
-}
+  return 'center'
+})
 
 const tableRef = ref<InstanceType<typeof ElTable> | null>(null)
 
-// 选中的row
-// const multipleSelection = ref<any[]>([])
-// 监听 多选选中
-const handleSelectionChange = (selection: any[]) => {
-  emit('selectionChange', cloneDeep([...selection]))
-}
-// 设置选中row
-// const toggleRowSelection = (rows: any[], flag = true) => {
-//   rows.forEach((row) => {
-//     // 如果不填第二个参数, 会切换选中状态
-//     tableRef.value?.toggleRowSelection(row, flag)
-//   })
-// }
+// 验证逻辑
+const { validate } = useForm({ formRef })
 
-// 清空选中状态
-const clearSelection = () => {
-  tableRef.value?.clearSelection()
-}
+// 开启行/单元格编辑 逻辑
+const {
+  activeRowIndex,
+  activeColEditId,
+  activeRowEditByIndex,
+  handleActiveEdit,
+  handleConfirm,
+  handleCancel,
+  confirmRowEdit
+} = useEdit({ dataClone, props, validate, emit })
 
-// 验证当前行
-function validate() {
-  let formRefList = []
-  const promiseList: Promise<any>[] = []
-  if (Array.isArray(formRef.value)) {
-    formRefList = formRef.value
-  } else {
-    formRef.value && formRefList.push(formRef.value)
-  }
-  formRefList.forEach((formRef) => {
-    const promise = new Promise((resolve, reject) => {
-      ;(formRef as ElFormType).validate((valid) => {
-        if (valid) {
-          resolve(valid)
-        } else {
-          reject(valid)
-        }
-      })
-    })
-    promiseList.push(promise)
-  })
-  return new Promise((resolve, reject) => {
-    Promise.all(promiseList).then((_) => {
-      resolve(true)
-    })
-  })
-}
+// 拖拽逻辑
+const { refreshKey } = useDrop({ props, tableRef, emit, dataClone })
+
+// 多选逻辑
+const { handleSelectionChange, clearSelection } = useSelection({
+  tableRef,
+  emit
+})
+
+// 分页逻辑
+const { handleSizeChange, handleCurrentChange } = usePage({ props, emit })
+
 defineExpose({
   activeRowEditByIndex, // 根据索引激活行编辑
   confirmRowEdit, // 确认当前行编辑
@@ -172,10 +140,19 @@ defineExpose({
 
 <template>
   <el-table
+    v-loading="loading"
+    :key="refreshKey"
     :data="dataClone"
     ref="tableRef"
+    v-bind="$attrs"
     @selection-change="handleSelectionChange"
   >
+    <!-- 开启排序 -->
+    <el-table-column v-if="dragSort" label="" width="40px" align="center">
+      <template #default>
+        <NIcon icon="Menu" :size="12" color="#409eff" class="move"></NIcon>
+      </template>
+    </el-table-column>
     <template v-for="(item, index) in options" :key="index">
       <!-- 判断 配置了type属性 -->
       <el-table-column
@@ -305,7 +282,19 @@ defineExpose({
     </el-table-column>
     <!--  -->
   </el-table>
-  <el-button type="primary" @click="reset">reset</el-button>
+  <div class="page-box" :style="{ justifyContent: pageAlignCalc }">
+    <el-pagination
+      v-if="showPage && total > pageSize"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :page-sizes="pageSizes"
+      :current-page="currentPage"
+      :page-size="pageSize"
+      :layout="pageLayout"
+      :total="total"
+    >
+    </el-pagination>
+  </div>
 </template>
 
 <style scoped lang="scss">
@@ -318,6 +307,14 @@ defineExpose({
   position: relative;
   top: 4px;
   margin-left: 6px;
+}
+.move {
+  cursor: move;
+  transform: rotate(45deg);
+}
+.page-box {
+  display: flex;
+  margin-top: 1em;
 }
 </style>
 <script lang="ts">
