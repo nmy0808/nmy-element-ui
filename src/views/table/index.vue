@@ -26,6 +26,26 @@ const data = ref([
 ])
 const options = ref<ITableOptions[]>([
   {
+    label: '#',
+    prop: '1',
+    type: 'expand',
+    slot: 'expand'
+  },
+  {
+    label: '#',
+    prop: 'index',
+    type: 'selection',
+    width: '200px',
+    align: 'center'
+  },
+  {
+    label: '#',
+    prop: 'index',
+    type: 'index',
+    width: '200px',
+    align: 'center'
+  },
+  {
     label: '姓名',
     prop: 'name',
     width: '200px',
@@ -84,6 +104,9 @@ const demoRules = {
 const nameRules = [
   { required: true, message: 'name~~', trigger: ['change', 'blur'] }
 ]
+const selectionChange = (rows: any) => {
+  console.log(rows)
+}
 </script>
 
 <template>
@@ -97,7 +120,9 @@ const nameRules = [
       :data="data"
       :options="options"
       @confirm="handleConfirm"
+      @selectionChange="selectionChange"
     >
+      <template #expand> 123123 </template>
       <template #date="{ $index }"> {{ $index }} </template>
       <template #edit_name="{ row }">
         <el-input v-model="row['name']"></el-input>

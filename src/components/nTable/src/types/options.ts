@@ -2,8 +2,8 @@ import { RuleItem } from './rules'
 
 export interface ITableOptions {
   label: string
-  prop?: string
-  type?: string
+  prop: string
+  type?: 'selection' | 'index' | 'expand'
   width?: string | number
   align?: 'left' | 'center' | 'right'
   slot?: string

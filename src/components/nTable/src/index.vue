@@ -5,7 +5,7 @@ import NIcon from '@/components/cIcon/index.vue'
 import { ElFormType } from '@/components/nForm/src/types/elForm'
 import cloneDeep from 'lodash/cloneDeep'
 import isEqual from 'lodash/isEqual'
-
+import { ElTable } from 'element-plus'
 const props = defineProps({
   options: {
     type: Array as PropType<ITableOptions[]>,
@@ -24,6 +24,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (e: 'confirm', payload: any): void
+  (e: 'selectionChange', payload: any[]): void
 }>()
 
 const dataClone = ref<any[]>([])
@@ -112,6 +113,28 @@ const handleRowClick = (row: any, column: any) => {
   console.log(row)
   console.log(column)
 }
+
+const tableRef = ref<InstanceType<typeof ElTable> | null>(null)
+
+// 选中的row
+// const multipleSelection = ref<any[]>([])
+// 监听 多选选中
+const handleSelectionChange = (selection: any[]) => {
+  emit('selectionChange', cloneDeep([...selection]))
+}
+// 设置选中row
+// const toggleRowSelection = (rows: any[], flag = true) => {
+//   rows.forEach((row) => {
+//     // 如果不填第二个参数, 会切换选中状态
+//     tableRef.value?.toggleRowSelection(row, flag)
+//   })
+// }
+
+// 清空选中状态
+const clearSelection = () => {
+  tableRef.value?.clearSelection()
+}
+
 // 验证当前行
 function validate() {
   let formRefList = []
@@ -140,19 +163,49 @@ function validate() {
   })
 }
 defineExpose({
-  activeRowEditByIndex,
-  confirmRowEdit,
-  cancelRowEdit: handleCancel
+  activeRowEditByIndex, // 根据索引激活行编辑
+  confirmRowEdit, // 确认当前行编辑
+  cancelRowEdit: handleCancel, // 取消行编辑激活状态
+  clearSelection // 清空多选选中
 })
 </script>
 
 <template>
   <el-table
     :data="dataClone"
-    :rules="{ name: [{ required: true, trigger: 'change' }] }"
+    ref="tableRef"
+    @selection-change="handleSelectionChange"
   >
     <template v-for="(item, index) in options" :key="index">
+      <!-- 判断 配置了type属性 -->
       <el-table-column
+        v-if="item.type === 'expand'"
+        :label="item.label"
+        :width="item.width"
+        :align="item.align"
+        :type="item.type"
+      >
+        <template #default="scope">
+          <slot
+            :name="item.slot"
+            :row="scope.row"
+            :$index="scope.$index"
+            :column="scope.column"
+            :store="scope.store"
+          ></slot>
+        </template>
+      </el-table-column>
+      <!-- 判断 配置了type属性 -->
+      <el-table-column
+        v-else-if="item.type === 'index' || item.type === 'selection'"
+        :label="item.label"
+        :width="item.width"
+        :align="item.align"
+        :type="item.type"
+      ></el-table-column>
+      <!-- 判断 没有配置type属性 -->
+      <el-table-column
+        v-else
         :label="item.label"
         :width="item.width"
         :align="item.align"
@@ -231,6 +284,7 @@ defineExpose({
         </template>
       </el-table-column>
     </template>
+    <!-- 按钮 -->
     <el-table-column v-bind="actionTableColumnOptions">
       <template #default="scope">
         <!-- 如果当前开启了行编辑, 当前行显示 取消保存 按钮 -->
