@@ -85,8 +85,6 @@ const init = () => {
     config: toolbarConfig,
     mode: 'default' // 或 'simple' 参考下文
   })
-  console.log(toolbar.getConfig())
-  console.log(editor.getMenuConfig('fontSize'))
 }
 
 watch(

@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import { DialogProps } from 'element-plus'
-import { PropType } from 'vue'
-
 const props = defineProps({
   visible: {
     type: Boolean,
     default: false
   },
   dialogOptions: {
-    type: Object as PropType<DialogProps>,
+    type: Object,
     default: () => ({})
   }
 })

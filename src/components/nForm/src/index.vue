@@ -60,16 +60,27 @@ const getModel = () => {
   return cloneDeep(model.value)
 }
 
-defineExpose({ resetFields, validate, getModel })
-
-onMounted(() => {
+const init = () => {
   const schema = cloneDeep(props.schema)
   schema.forEach((item) => {
     const prop = item.prop as string
     model.value[prop] = item.value
     rules.value[prop] = item.rules
   })
+}
+
+onMounted(() => {
+  init()
 })
+
+watch(
+  props,
+  () => {
+    init()
+  },
+  { deep: true }
+)
+defineExpose({ resetFields, validate, getModel })
 </script>
 
 <template>

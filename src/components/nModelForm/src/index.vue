@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { DialogProps } from 'element-plus'
 import { PropType } from 'vue'
 import NForm from '../../nForm/src/index.vue'
 import { IFormSchema } from '../../nForm/src/types/options'
