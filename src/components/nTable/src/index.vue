@@ -247,7 +247,9 @@ defineExpose({
               :store="scope.store"
             ></slot>
             <!--  普通, 没有slot -->
-            <span v-else>{{ scope.row[item.prop!] }}</span>
+            <span v-else>{{
+              item.parse ? item.parse({ ...scope }) : scope.row[item.prop!]
+            }}</span>
             <!--  编辑按钮 -->
             <NIcon
               v-if="item.editable"

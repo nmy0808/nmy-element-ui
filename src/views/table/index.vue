@@ -70,7 +70,9 @@ const options = ref<ITableOptions[]>([
     prop: 'date',
     width: '',
     align: 'center',
-    slot: 'date'
+    parse: (scope: any) => {
+      return scope.row.date
+    }
   }
 ])
 const tableRef = ref<InstanceType<typeof NTable> | null>(null)
