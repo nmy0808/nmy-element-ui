@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-import NIcon from '@/components/nIcon/src/index.vue'
+import NIcon from '../../nIcon/src/index.vue'
 const visible = ref(false)
 const search = ref('')
 const keys = Object.keys(ElementPlusIconsVue)
