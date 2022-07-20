@@ -4,6 +4,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  title: {
+    type: String,
+    default: ''
+  },
   dialogOptions: {
     type: Object,
     default: () => ({})
@@ -34,6 +38,7 @@ const handleClosed = () => {
 <template>
   <el-dialog
     destroy-on-close
+    :title="title"
     v-bind="dialogOptions"
     @closed="handleClosed"
     v-model="currentVisible"

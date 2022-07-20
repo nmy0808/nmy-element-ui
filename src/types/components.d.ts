@@ -5,7 +5,7 @@ import '@vue/runtime-core'
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    CIcon: typeof import('./../components/cIcon/index.vue')['default']
+    NIcon: typeof import('../components/nIcon/src/index.vue')['default']
     Draggable: typeof import('./../components/draggable/index.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']

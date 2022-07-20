@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Slider from '@/components/slider/index'
-import NIcon from '@/components/cIcon/index.vue'
+import NIcon from '@/components/nIcon/src/index.vue'
 const route = useRoute()
 const collapse = ref(false)
 const defaultActive = computed(() => route.fullPath.slice(1))

@@ -18,6 +18,14 @@ const routes: RouteRecordRaw[] = [
         }
       },
       {
+        path: 'nDraggable',
+        component: () => import('@/views/draggable/index.vue'),
+        meta: {
+          title: 'form',
+          icon: 'Files'
+        }
+      },
+      {
         path: 'form',
         component: () => import('@/views/form/index.vue'),
         meta: {

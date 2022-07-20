@@ -63,6 +63,7 @@ export default function ({ dataClone, props, validate, emit }: any) {
     const scope = { $index, row }
     return handleConfirm(scope)
   }
+  const resetFields = () => (dataClone.value = cloneDeep(props.data))
   return {
     activeRowIndex,
     activeColEditId,
@@ -70,6 +71,7 @@ export default function ({ dataClone, props, validate, emit }: any) {
     handleActiveEdit,
     handleConfirm,
     handleCancel,
-    confirmRowEdit
+    confirmRowEdit,
+    resetFields
   }
 }

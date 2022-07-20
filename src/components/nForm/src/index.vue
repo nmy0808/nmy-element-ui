@@ -3,7 +3,7 @@ import { PropType } from 'vue'
 import { IFormSchema } from './types/options'
 import { ElFormType } from './types/elForm'
 import cloneDeep from 'lodash/cloneDeep'
-import NEditor from '@/components//nEditor/src/index.vue'
+import NEditor from '@/components/nEditor/src/index.vue'
 // const NEditor = defineAsyncComponent(
 //   () => import('@/components//nEditor/src/index.vue')
 // )

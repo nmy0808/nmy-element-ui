@@ -1,12 +1,12 @@
 import { defineComponent, PropType } from 'vue'
 import { ElMenu, MenuProps, ElMenuItem, ElSubMenu, ElIcon } from 'element-plus'
 import 'element-plus/es/components/menu/style/css'
-import CIcon from '@/components/cIcon/index.vue'
 import './style.scss'
+import NIcon from '@/components/nIcon/src/index.vue'
 
 export default defineComponent({
   name: 'Slider',
-  components: { ElMenu, ElMenuItem, ElSubMenu, ElIcon, CIcon },
+  components: { ElMenu, ElMenuItem, ElSubMenu, ElIcon, NIcon },
   props: {
     data: {
       type: Array,
@@ -21,7 +21,7 @@ export default defineComponent({
     const render = (data: any[]) => {
       return data.map((item) => {
         const Icon = item.meta.icon ? (
-          <CIcon icon={item.meta.icon}></CIcon>
+          <NIcon icon={item.meta.icon}></NIcon>
         ) : null
         const renderSlots = {
           title: () => (

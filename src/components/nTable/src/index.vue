@@ -3,7 +3,7 @@ import { PropType } from 'vue'
 import { ElFormType } from '@/components/nForm/src/types/elForm'
 import { ITableOptions } from './types/options'
 import { ElTable } from 'element-plus'
-import NIcon from '@/components/cIcon/index.vue'
+import NIcon from '@/components/nIcon/src/index.vue'
 import cloneDeep from 'lodash/cloneDeep'
 import useDrop from './hooks/useDrop'
 import useSelection from './hooks/useSelection'
@@ -82,14 +82,6 @@ const emit = defineEmits<{
 
 const dataClone = ref<any[]>([])
 
-watch(
-  props.data,
-  () => {
-    dataClone.value = cloneDeep(props.data)
-  },
-  { deep: true, immediate: true }
-)
-
 const formRef = ref<ElFormType | null>(null)
 
 // 计算当前分页对齐方向
@@ -115,7 +107,8 @@ const {
   handleActiveEdit,
   handleConfirm,
   handleCancel,
-  confirmRowEdit
+  confirmRowEdit,
+  resetFields
 } = useEdit({ dataClone, props, validate, emit })
 
 // 拖拽逻辑
@@ -130,10 +123,19 @@ const { handleSelectionChange, clearSelection } = useSelection({
 // 分页逻辑
 const { handleSizeChange, handleCurrentChange } = usePage({ props, emit })
 
+watch(
+  props.data,
+  () => {
+    refreshKey.value++
+    dataClone.value = cloneDeep(props.data)
+  },
+  { deep: true, immediate: true }
+)
 defineExpose({
   activeRowEditByIndex, // 根据索引激活行编辑
   confirmRowEdit, // 确认当前行编辑
   cancelRowEdit: handleCancel, // 取消行编辑激活状态
+  resetFields, // 重置数据
   clearSelection // 清空多选选中
 })
 </script>
@@ -277,8 +279,8 @@ defineExpose({
           name="action"
           :row="scope.row"
           :$index="scope.$index"
-          :$column="scope.column"
-          :$store="scope.store"
+          :column="scope.column"
+          :store="scope.store"
         ></slot>
       </template>
     </el-table-column>

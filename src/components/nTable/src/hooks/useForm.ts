@@ -22,6 +22,7 @@ export default function ({ formRef }: any) {
       })
       promiseList.push(promise)
     })
+
     return new Promise((resolve, reject) => {
       Promise.all(promiseList).then((_) => {
         resolve(true)

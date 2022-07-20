@@ -54,6 +54,6 @@ onMounted(() => {
 <style scoped lang="scss"></style>
 <script lang="ts">
 export default {
-  name: 'Draggable'
+  name: 'NDraggable'
 }
 </script>

@@ -6,7 +6,7 @@ const props = defineProps<IProp>()
 </script>
 
 <template>
-  <div class="c-icon">
+  <div class="n-icon">
     <el-icon v-bind="$attrs">
       <component :is="icon"></component>
     </el-icon>
@@ -14,12 +14,12 @@ const props = defineProps<IProp>()
 </template>
 
 <style scoped lang="scss">
-.c-icon {
+.n-icon {
   display: inline-block;
 }
 </style>
 <script lang="ts">
 export default {
-  name: 'CIcon'
+  name: 'NIcon'
 }
 </script>
