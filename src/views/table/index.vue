@@ -1,33 +1,37 @@
 <script setup lang="ts">
 import { ITableOptions } from '@/components/nTable/src/types/options'
 import NTable from '@/components/nTable/src/index.vue'
-const data = ref([
-  {
-    date: 1795403471000,
-    name: 'Jack',
-    age: 18,
-    sex: 1
-  },
-  {
-    date: 1795403471000,
-    name: 'Tom',
-    age: 19,
-    sex: 0
-  },
-  {
-    date: 1795403471000,
-    name: 'Lucy',
-    age: 20,
-    sex: 1
-  },
-  {
-    date: 1795403471000,
-    name: 'Haney',
-    age: 21,
-    sex: 1
-  }
-])
+const data = ref<any>([])
 
+const getListData = () => {
+  data.value = [
+    {
+      date: 1795403471000,
+      name: 'Jack',
+      age: 18,
+      sex: 1
+    },
+    {
+      date: 1795403471000,
+      name: 'Tom',
+      age: 19,
+      sex: 0
+    },
+    {
+      date: 1795403471000,
+      name: 'Lucy',
+      age: 20,
+      sex: 1
+    },
+    {
+      date: 1795403471000,
+      name: 'Haney',
+      age: 21,
+      sex: 1
+    }
+  ]
+}
+getListData()
 const options = ref<ITableOptions[]>([
   {
     label: '#',
