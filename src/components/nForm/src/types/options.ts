@@ -38,5 +38,6 @@ export interface IFormSchema {
   editorOptions?: {
     customUpload: customUploadType
   }
+  customUpload?: (file: File) => Promise<string> // 自定义上传, 返回url字符串
   children?: IFormSchema[]
 }

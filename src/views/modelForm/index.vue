@@ -115,6 +115,28 @@ const schema = ref<IFormSchema[]>([
     ]
   },
   {
+    type: 'upload',
+    value: '',
+    label: '图片1',
+    prop: 'img1',
+    customUpload: async (file: File) => {
+      // 1.自定义上传请求
+      // 2.返回图片url即可
+      return 'https://images.unsplash.com/photo-1657299156185-6f5de6da0996?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80'
+    }
+  },
+  {
+    type: 'upload',
+    value: '',
+    label: '图片2',
+    prop: 'img2',
+    customUpload: async (file: File) => {
+      // 1.自定义上传请求
+      // 2.返回图片url即可
+      return 'https://images.unsplash.com/photo-1657299156528-2d50a9a6a444?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1yZWxhdGVkfDZ8fHxlbnwwfHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60'
+    }
+  },
+  {
     type: 'editor',
     value: '13',
     label: '描述',
@@ -125,18 +147,11 @@ const schema = ref<IFormSchema[]>([
     },
     editorOptions: {
       customUpload: (file, insertFn) => {
-        const formData = new FormData()
-        formData.append('file', file)
-        fetch('http://127.0.0.1:8888/api/upload', {
-          method: 'POST',
-          body: formData
-        })
-          .then((res) => {
-            return res.json()
-          })
-          .then((res) => {
-            insertFn(`${res.data}`, '', '')
-          })
+        insertFn(
+          'https://images.unsplash.com/photo-1657299156528-2d50a9a6a444?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1yZWxhdGVkfDZ8fHxlbnwwfHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
+          '',
+          ''
+        )
       }
     },
     rules: [
@@ -157,19 +172,12 @@ const schema = ref<IFormSchema[]>([
       height: 300
     },
     editorOptions: {
-      customUpload: (file: any, insertFn: any) => {
-        const formData = new FormData()
-        formData.append('file', file)
-        fetch('http://127.0.0.1:8888/api/upload', {
-          method: 'POST',
-          body: formData
-        })
-          .then((res) => {
-            return res.json()
-          })
-          .then((res) => {
-            insertFn(`${res.data}`, '', '')
-          })
+      customUpload: (file, insertFn) => {
+        insertFn(
+          'https://images.unsplash.com/photo-1657299156528-2d50a9a6a444?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1yZWxhdGVkfDZ8fHxlbnwwfHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
+          '',
+          ''
+        )
       }
     },
     rules: [
@@ -185,13 +193,19 @@ const schema = ref<IFormSchema[]>([
 const modelFormRef = ref<InstanceType<typeof NModelForm> | null>(null)
 // modelForm提供 confirm 事件
 const handleConfirm = (model: any) => {
+  currentModel.value = model
+  jsonVisible.value = true
   console.log(model)
 }
+const jsonVisible = ref(false)
+const currentModel = ref(null)
 // 手动触发验证, 获取model
 const handleConfirm2 = async () => {
   const flag = await modelFormRef.value?.validate()
   if (flag) {
     const model = modelFormRef.value?.getModel()
+    currentModel.value = model
+    jsonVisible.value = true
     console.log(model)
   }
 }
@@ -213,6 +227,15 @@ const handleConfirm2 = async () => {
         <el-button type="primary" @click="handleConfirm2">确定</el-button>
       </template> -->
     </NModelForm>
+    <NDialog v-model:visible="jsonVisible">
+      <template #body>
+        提交数据:
+        <pre>
+      {{ currentModel }}
+    </pre
+        >
+      </template>
+    </NDialog>
   </div>
 </template>
 

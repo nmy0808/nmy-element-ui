@@ -103,6 +103,12 @@ defineExpose({ resetFields, validate, getModel })
             @change="(html:string) => handleEditChange(item.prop!, html)"
           ></NEditor>
         </template>
+        <template v-if="item.type === 'upload'">
+          <NUpload
+            v-model="model[item.prop!]"
+            :custom-upload="item.customUpload"
+          ></NUpload>
+        </template>
         <template v-else>
           <component
             :is="`el-${item.type}`"

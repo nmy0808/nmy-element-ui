@@ -7,6 +7,7 @@ import NDialog from './nDialog'
 import NModelForm from './nModelForm'
 import NTable from './NTable'
 import NDraggable from './nDraggable'
+import NUpload from './NUpload'
 
 const components = [
   NIcon,
@@ -16,7 +17,8 @@ const components = [
   NDialog,
   NModelForm,
   NTable,
-  NDraggable
+  NDraggable,
+  NUpload
 ]
 export default {
   install(app: App) {

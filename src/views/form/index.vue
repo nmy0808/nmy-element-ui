@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { IActionScope } from '@/components/nForm/src/types/actionScope'
 import { IFormSchema } from '@/components/nForm/src/types/options'
+import NForm from '@/components/NForm/src/index.vue'
 
 const schema = ref<IFormSchema[]>([
   {
@@ -114,6 +115,28 @@ const schema = ref<IFormSchema[]>([
     ]
   },
   {
+    type: 'upload',
+    value: '',
+    label: '图片1',
+    prop: 'img1',
+    customUpload: async (file: File) => {
+      // 1.自定义上传请求
+      // 2.返回图片url即可
+      return 'https://images.unsplash.com/photo-1657299156185-6f5de6da0996?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80'
+    }
+  },
+  {
+    type: 'upload',
+    value: '',
+    label: '图片2',
+    prop: 'img2',
+    customUpload: async (file: File) => {
+      // 1.自定义上传请求
+      // 2.返回图片url即可
+      return 'https://images.unsplash.com/photo-1657299156528-2d50a9a6a444?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1yZWxhdGVkfDZ8fHxlbnwwfHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60'
+    }
+  },
+  {
     type: 'editor',
     value: '13',
     label: '描述',
@@ -121,6 +144,15 @@ const schema = ref<IFormSchema[]>([
     placeholder: '请填写描述',
     editorAttrs: {
       height: 300
+    },
+    editorOptions: {
+      customUpload: (file, insertFn) => {
+        insertFn(
+          'https://images.unsplash.com/photo-1657299156528-2d50a9a6a444?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1yZWxhdGVkfDZ8fHxlbnwwfHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
+          '',
+          ''
+        )
+      }
     },
     rules: [
       {
@@ -139,6 +171,15 @@ const schema = ref<IFormSchema[]>([
     editorAttrs: {
       height: 300
     },
+    editorOptions: {
+      customUpload: (file, insertFn) => {
+        insertFn(
+          'https://images.unsplash.com/photo-1657299156528-2d50a9a6a444?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1yZWxhdGVkfDZ8fHxlbnwwfHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
+          '',
+          ''
+        )
+      }
+    },
     rules: [
       {
         trigger: 'blur',
@@ -151,15 +192,18 @@ const schema = ref<IFormSchema[]>([
 const formOptions = {
   labelWidth: '200px'
 }
-const nFormRef = ref(null)
+const visible = ref(false)
+const currentModel = ref(null)
+const nFormRef = ref<InstanceType<typeof NForm> | null>(null)
 const handleSubmit = async ({ form, model }: IActionScope) => {
-  const flag = (await (nFormRef.value as any).validate()) as boolean
+  const flag = (await nFormRef.value?.validate()) as boolean
   if (flag) {
-    console.log(model)
+    currentModel.value = model
+    visible.value = true
   }
 }
-const handleReset = (form: IActionScope['form']) => {
-  ;(nFormRef.value as any).resetFields()
+const handleReset = () => {
+  nFormRef.value?.resetFields()
 }
 </script>
 
@@ -172,10 +216,21 @@ const handleReset = (form: IActionScope['form']) => {
       @submit="handleSubmit"
     >
       <template #action="scope">
-        <el-button type="" @click="handleReset(scope.form)">重置</el-button>
-        <el-button type="primary" @click="handleSubmit(scope)">提交</el-button>
+        <el-button type="" @click="handleReset">重置</el-button>
+        <el-button type="primary" @click="handleSubmit(scope as any)"
+          >提交</el-button
+        >
       </template>
     </NForm>
+    <NDialog v-model:visible="visible">
+      <template #body>
+        提交数据:
+        <pre>
+      {{ currentModel }}
+    </pre
+        >
+      </template>
+    </NDialog>
   </div>
 </template>
 
