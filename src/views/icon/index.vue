@@ -2,7 +2,7 @@
 
 <template>
   <div class="home">
-    <IconChoose></IconChoose>
+    <NIconChoose></NIconChoose>
   </div>
 </template>
 

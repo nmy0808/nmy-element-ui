@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PropType } from 'vue'
+import { ref, watch, computed, PropType } from 'vue'
 import { ElFormType } from '@/components/nForm/src/types/elForm'
 import { ITableOptions } from './types/options'
 import { ElTable } from 'element-plus'
@@ -125,7 +125,7 @@ const { handleSelectionChange, clearSelection } = useSelection({
 const { handleSizeChange, handleCurrentChange } = usePage({ props, emit })
 
 watch(
-  props.data,
+  () => props.data,
   () => {
     refreshKey.value++
     dataClone.value = cloneDeep(props.data)

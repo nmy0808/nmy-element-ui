@@ -7,7 +7,7 @@ import {
   IDomEditor,
   IToolbarConfig
 } from '@wangeditor/editor'
-import { PropType } from 'vue'
+import { ref, watch, onMounted, PropType, nextTick, onBeforeUnmount } from 'vue'
 import { InsertFnType } from './types/InsertFnType'
 
 const props = defineProps({

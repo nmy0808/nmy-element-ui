@@ -1,3 +1,4 @@
+import { ref, nextTick, onMounted } from 'vue'
 import cloneDeep from 'lodash/cloneDeep'
 import Sortable from 'sortablejs'
 

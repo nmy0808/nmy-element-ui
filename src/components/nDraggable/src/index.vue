@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, PropType, ref, nextTick } from 'vue'
+import { ref, onMounted, PropType, nextTick } from 'vue'
 import Sortable from 'sortablejs'
 
 const props = defineProps({

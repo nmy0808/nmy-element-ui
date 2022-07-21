@@ -2,9 +2,10 @@
 import { ITableOptions } from '@/components/nTable/src/types/options'
 import NTable from '@/components/nTable/src/index.vue'
 const data = ref<any>([])
-
+const currentPage = ref(1)
+const total = ref(20)
 const getListData = () => {
-  data.value = [
+  const list = [
     {
       date: 1795403471000,
       name: 'Jack',
@@ -30,6 +31,8 @@ const getListData = () => {
       sex: 1
     }
   ]
+  data.value = list.sort(() => Math.random() - 0.7)
+  console.log(data.value)
 }
 getListData()
 const options = ref<ITableOptions[]>([
@@ -147,6 +150,9 @@ const handleDragSort = (sortData: any[]) => {
       >取消编辑</el-button
     >
     <el-button type="primary" @click="handleResetFields">重置数据</el-button>
+    <pre>
+      {{ data }}
+    </pre>
     <NTable
       border
       ref="tableRef"
@@ -187,6 +193,15 @@ const handleDragSort = (sortData: any[]) => {
         <el-button type="">按钮</el-button>
       </template>
     </NTable>
+    <el-pagination
+      style="float: left; transform: translateY(-20px)"
+      v-model:currentPage="currentPage"
+      :page-size="10"
+      layout="total, prev, pager, next, jumper"
+      :total="total"
+      @size-change="getListData"
+      @current-change="getListData"
+    />
   </div>
 </template>
 

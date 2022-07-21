@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PropType } from 'vue'
+import { ref, watch, PropType } from 'vue'
 import NForm from '../../nForm/src/index.vue'
 import { IFormSchema } from '../../nForm/src/types/options'
 

@@ -1,6 +1,6 @@
 import { App } from 'vue'
 import NIcon from './nIcon'
-import IconChoose from './iconChoose'
+import nIconChoose from './nIconChoose'
 import NForm from './nForm'
 import NEditor from './nEditor'
 import NDialog from './nDialog'
@@ -11,7 +11,7 @@ import NUpload from './NUpload'
 
 const components = [
   NIcon,
-  IconChoose,
+  nIconChoose,
   NForm,
   NEditor,
   NDialog,
