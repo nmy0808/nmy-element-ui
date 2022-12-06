@@ -16,6 +16,9 @@ const props = defineProps<IProp>()
 <style scoped lang="scss">
 .n-icon {
   display: inline-block;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
 <script lang="ts">

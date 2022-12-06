@@ -207,32 +207,35 @@ defineExpose({
             <el-form :model="dataClone[scope.$index]" ref="formRef">
               <el-form-item :prop="item.prop" :rules="item.rules as any || []">
                 <div class="col-edit-box">
-                  <slot
-                    v-if="item.editSlot"
-                    :name="item.editSlot"
-                    :row="scope.row"
-                    :$index="scope.$index"
-                    :$column="scope.column"
-                    :$store="scope.store"
-                  ></slot>
+                  <div v-if="item.editSlot" class="flex-1">
+                    <slot
+                      :name="item.editSlot"
+                      :row="scope.row"
+                      :$index="scope.$index"
+                      :$column="scope.column"
+                      :$store="scope.store"
+                    ></slot>
+                  </div>
                   <!-- 注意: 如果没有配置开启编辑状态的表单插槽, 默认为输入框表单组件 -->
                   <el-input v-else v-model="scope.row[item.prop!]"></el-input>
                   <!-- 当前如果是激活行编辑, 列编辑操作图标不会显示 -->
                   <template v-if="activeRowIndex === -1">
-                    <NIcon
-                      icon="check"
-                      @click.stop="handleConfirm(scope)"
-                      :size="18"
-                      color="green"
-                      class="icon"
-                    ></NIcon>
-                    <NIcon
-                      icon="close"
-                      @click.stop="handleCancel"
-                      :size="18"
-                      color="red"
-                      class="icon"
-                    ></NIcon>
+                    <div class="edit-icon-wrap">
+                      <NIcon
+                        icon="check"
+                        @click.stop="handleConfirm(scope)"
+                        :size="18"
+                        color="green"
+                        class="icon"
+                      ></NIcon>
+                      <NIcon
+                        icon="close"
+                        @click.stop="handleCancel"
+                        :size="18"
+                        color="red"
+                        class="icon"
+                      ></NIcon>
+                    </div>
                   </template>
                 </div>
               </el-form-item>
@@ -240,28 +243,33 @@ defineExpose({
           </template>
           <!-- 当前没有开启编辑的状态 -->
           <template v-else>
-            <!-- 有slot -->
-            <slot
-              v-if="item.slot"
-              :name="item.slot"
-              :row="scope.row"
-              :$index="scope.$index"
-              :column="scope.column"
-              :store="scope.store"
-            ></slot>
-            <!--  普通, 没有slot -->
-            <span v-else>{{
-              item.parse ? item.parse({ ...scope }) : scope.row[item.prop!]
-            }}</span>
-            <!--  编辑按钮 -->
-            <NIcon
-              v-if="item.editable"
-              class="icon-edit icon"
-              icon="edit"
-              :size="18"
-              color="#409eff"
-              @click.stop="handleActiveEdit(scope)"
-            ></NIcon>
+            <div
+              class="flex items-center"
+              :class="{ 'justify-center': item.align }"
+            >
+              <!-- 有slot -->
+              <slot
+                v-if="item.slot"
+                :name="item.slot"
+                :row="scope.row"
+                :$index="scope.$index"
+                :column="scope.column"
+                :store="scope.store"
+              ></slot>
+              <!--  普通, 没有slot -->
+              <span v-else>{{
+                item.parse ? item.parse({ ...scope }) : scope.row[item.prop!]
+              }}</span>
+              <!--  编辑按钮 -->
+              <NIcon
+                v-if="item.editable"
+                class="icon-edit icon"
+                icon="edit"
+                :size="18"
+                color="#409eff"
+                @click.stop="handleActiveEdit(scope)"
+              ></NIcon>
+            </div>
           </template>
         </template>
       </el-table-column>
@@ -303,6 +311,18 @@ defineExpose({
 </template>
 
 <style scoped lang="scss">
+.flex {
+  display: flex;
+}
+.items-center {
+  align-items: center;
+}
+.justify-center {
+  justify-content: center;
+}
+.flex-1 {
+  flex: 1 1 0%;
+}
 .col-edit-box {
   display: flex;
   align-items: center;
@@ -310,7 +330,6 @@ defineExpose({
 .icon {
   cursor: pointer;
   position: relative;
-  top: 4px;
   margin-left: 6px;
 }
 .move {
@@ -320,6 +339,21 @@ defineExpose({
 .page-box {
   display: flex;
   margin-top: 1em;
+}
+.el-form-item {
+  margin-top: 18px;
+}
+.noedit-wrap {
+  width: 80%;
+}
+.icon-edit {
+  margin-right: 0;
+}
+.edit-icon-wrap {
+  width: 50px;
+  display: flex;
+  align-items: center;
+  margin-left: 6px;
 }
 </style>
 <script lang="ts">
